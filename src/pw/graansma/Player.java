@@ -1,6 +1,9 @@
 package pw.graansma;
 
 import org.w3c.dom.Element;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -19,18 +22,16 @@ public class Player {
     public static final String PITCHER    = "P";
     public static final String CATCHER    = "C";
     public static final String HITTER     = "DH";
-    //todo sp and rp
 
-    //todo figure out if api has actual dh in it
     private static final Map<String, List<String>> positions = new HashMap<>();
     static {
-        map.put(INFIELD, Arrays.asList("1B", "2B", "3B", "SS"));
-        map.put(OUTFIELD, Arrays.asList("LF", "CF", "RF"));
-        map.put(PITCHER, Arrays.asList("SP", "RP"));
-        map.put(STARTER, Collections.singletonList("SP"));
-        map.put(RELIEVER, Collections.singletonList("RP"));
-        map.put(CATCHER, Collections.singletonList("C"));
-        map.put(HITTER, Collections.singletonList("DH")); //todo can be all
+        positions.put(INFIELDER, Arrays.asList("1B", "2B", "3B", "SS"));
+        positions.put(OUTFIELDER, Arrays.asList("LF", "CF", "RF"));
+        positions.put(PITCHER, Arrays.asList("SP", "RP"));
+        positions.put(STARTER, Collections.singletonList("SP"));
+        positions.put(RELIEVER, Collections.singletonList("RP"));
+        positions.put(CATCHER, Collections.singletonList("C"));
+        positions.put(HITTER, Collections.singletonList("DH")); //todo can be all
     }
 
     private String getString(Element element, String tag) {
@@ -50,7 +51,7 @@ public class Player {
     }
 
     public boolean is(String pos) {
-        return positions.hasKey(pos) ? positions.get(pos).contains(position) : false;
+        return positions.containsKey(pos) && positions.get(pos).contains(position);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package pw.graansma;
+package graansma.pw
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,10 +16,12 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
-    private static final String RANKINGS_URL = "https://fantasybaseballnerd.com/service/league-rankings";
+    private static final String RANKINGS_URL = "https://fantasybaseballnerd.com/service/draft-rankings";
 
     private final List<Player> league;
     private final List<Player> team;
@@ -31,7 +33,6 @@ public class Main {
         teamFile = file("team.txt");
         unavailableFile = file("unavailable.txt");
 
-        league = new ArrayList<>();
         league = new ArrayList<>();
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -62,7 +63,7 @@ public class Main {
                 players.add(getPlayer(inputLine.replace("\n", "").replace("\r", "")));
             }
         } catch(Exception e) {
-            e.printStackTrace()
+            e.printStackTrace();
         }
         return players;
     }
@@ -70,7 +71,11 @@ public class Main {
     private File file(String name) {
         File file = new File(name);
         if(!file.exists()) {
-            file.createNewFile()
+            try {
+                file.createNewFile();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }
@@ -108,42 +113,29 @@ public class Main {
     }
 
     private Player pick() {
-        List<Player> available = new ArrayList<>(m.league);
-        available.removeAll(m.unavailable);
-        available.removeAll(m.team);
+        List<Player> available = new ArrayList<>(league);
+        available.removeAll(unavailable);
+        available.removeAll(team);
         Map<String, Integer> neededPositions = teamStructure();
 
         for(Player p : team) {
-            for(String pos : neededPositions.getKeys()) {
+            for(String pos : neededPositions.keySet()) {
                 if(p.is(pos)) {
                     neededPositions.put(pos, neededPositions.get(pos) - 1);
-                    if(neededPositions == 0) {
+                    if(neededPositions.get(pos) == 0) {
                         neededPositions.remove(pos);
                     }
                     break;
                 }
             }
         }
-        //todo have a roster file I can't pick taken players
-        // pick the best ranked player that I have an open position for
-        // positions:
-                    /*
-                        SP x 2
-                        RP x 2
-                        P  x 2 (RP or SP)
-                        IF x 4 (1B or 2B or SS or 3B)
-                        OF x 4 (LF or CF or RF)
-                        C  x 1
-                        DH x 1 (any)
-                     */
-
 
         int index = 0;
         double benchMark = Double.MAX_VALUE;
         for(int i = 0; i < available.size(); i++) {
             Player p = available.get(i);
-            for(int j=0; j<neededPositions.keySet().size(); j++) {
-                if(p.is(neededPositions.keySet().size().get(j))) {
+            for(String pos : neededPositions.keySet()) {
+                if(p.is(pos)) {
                     double score = p.getRating();
                     if(score < benchMark) {
                         benchMark = score;
@@ -176,17 +168,17 @@ public class Main {
     // rule-out [-reset] "Player One" "Player Two" ...
     // my-team "Player One" "Player Two" ...
     public static void main(String... args) {
-	    if(args.length < 2) {
-	        System.err.println(
-	                "Usage: java Main cut x" +
-                    "\n  or: java Main pick" +
-                    "\n  or: java Main rule-out <player>..." +
-                    "\n  or: java Main my-team <player>..."
+        if(args.length < 1) {
+            System.err.println(
+                    "Usage: java Main cut x" +
+                            "\n  or: java Main pick" +
+                            "\n  or: java Main rule-out <player>..." +
+                            "\n  or: java Main my-team <player>..."
             );
         } else {
-	        Main m = new Main();
+            Main m = new Main();
 
-	        switch(args[0]) {
+            switch(args[0]) {
                 case "cut":
                     int count = Integer.valueOf(args[1]);
                     while(m.team.size() > count) {
@@ -202,7 +194,7 @@ public class Main {
                 case "rule-out":
                     int index = 1;
                     if(args[1].equals("-reset")) {
-                        m.unavailable.removeAll();
+                        m.unavailable.clear();
                         index = 2;
                     }
                     for(int i = index; i < args.length; i++) {
@@ -211,9 +203,9 @@ public class Main {
                     m.save(m.unavailable, m.unavailableFile);
                     break;
                 case "my-team":
-                    m.team.removeAll();
+                    m.team.clear();
                     for(int i = 1; i < args.length; i++) {
-                        m.team.add(getPlayer(args[i]));
+                        m.team.add(m.getPlayer(args[i]));
                     }
                     m.save(m.team, m.teamFile);
                     break;
