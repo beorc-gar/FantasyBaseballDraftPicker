@@ -1,4 +1,4 @@
-package graansma.pw
+package pw.graansma
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
