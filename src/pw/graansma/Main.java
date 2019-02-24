@@ -1,4 +1,4 @@
-package pw.graansma
+package pw.graansma;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -97,6 +97,7 @@ public class Main {
                 return p;
             }
         }
+        System.err.println("No such player: " + name);
         return null;
     }
 
@@ -163,7 +164,7 @@ public class Main {
         return team.remove(index);
     }
 
-    // cut 15
+    // cut 10
     // pick
     // rule-out [-reset] "Player One" "Player Two" ...
     // my-team "Player One" "Player Two" ...
@@ -188,7 +189,7 @@ public class Main {
                     break;
                 case "pick":
                     Player picked = m.pick();
-                    System.out.println(picked.name + " " + picked.position);
+                    System.out.println(picked.toString());
                     m.save(m.team, m.teamFile);
                     break;
                 case "rule-out":

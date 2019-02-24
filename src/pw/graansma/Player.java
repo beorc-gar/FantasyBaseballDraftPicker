@@ -55,6 +55,11 @@ public class Player {
     }
 
     @Override
+    public String toString() {
+        return name + " " + position + " : " + rank + ", " + draftPosition;
+    }
+
+    @Override
     public boolean equals(Object o) {
         String name = null;
         if(o instanceof String) {
