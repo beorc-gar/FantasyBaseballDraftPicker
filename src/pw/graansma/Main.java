@@ -92,8 +92,8 @@ public class Main {
     }
 
     private Player getPlayer(String name) {
-        for(Player p : league) {
-            if(p.name.equalsIgnoreCase(name)) {
+        for (Player p : league) {
+            if (p.name.equalsIgnoreCase(name)) {
                 return p;
             }
         }
@@ -210,7 +210,11 @@ public class Main {
                     }
                     m.save(m.team, m.teamFile);
                     break;
-
+                case "status":
+                    for(Player player : m.team) {
+                        System.out.println(player.toString());
+                    }
+                    break;
             }
         }
     }
